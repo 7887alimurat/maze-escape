@@ -10,6 +10,8 @@ import java.util.Arrays;
  */
 public class Zones {
 
+    private static final long INF = Long.MAX_VALUE / 4;
+
     /**
      * Mission 4. Kosaraju. Returns zoneOf: zoneOf[cell] = number of the zone, numbers 0 .. zones-1.
      * Number the zones in the order in which the second pass finds them. That order is a topological order
@@ -97,7 +99,51 @@ public class Zones {
      * [1] the cost of the cheapest route from the zone of cell 0 to the zone of the last cell.
      */
     public static long[] routes(Input.Slides s, int[] zoneOf, int zoneCount) {
-        // TODO
-        return new long[]{0, 0};
+        long[][] edgeCost = new long[zoneCount][zoneCount];
+        for (long[] row : edgeCost) Arrays.fill(row, INF);
+
+        for (int i = 0; i < s.count(); i++) {
+            int fromZone = zoneOf[s.from()[i]];
+            int toZone = zoneOf[s.to()[i]];
+
+            if (fromZone != toZone) {
+                edgeCost[fromZone][toZone] =
+                        Math.min(edgeCost[fromZone][toZone], s.time()[i]);
+            }
+        }
+
+        int start = zoneOf[0];
+        int target = zoneOf[s.n() - 1];
+
+        long[] distance = new long[zoneCount];
+        Arrays.fill(distance, INF);
+        distance[start] = 0;
+
+        // Длина самой длинной цепочки зон в DAG.
+        long[] longest = new long[zoneCount];
+        Arrays.fill(longest, 1);
+
+        // Номера зон уже идут в топологическом порядке.
+        for (int from = 0; from < zoneCount; from++) {
+            for (int to = from + 1; to < zoneCount; to++) {
+                if (edgeCost[from][to] == INF) continue;
+
+                if (distance[from] != INF) {
+                    distance[to] = Math.min(
+                            distance[to],
+                            distance[from] + edgeCost[from][to]
+                    );
+                }
+
+                longest[to] = Math.max(longest[to], longest[from] + 1);
+            }
+        }
+
+        long stages = 0;
+        for (long length : longest) {
+            stages = Math.max(stages, length);
+        }
+
+        return new long[]{stages, distance[target]};
     }
 }
