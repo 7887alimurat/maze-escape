@@ -1,9 +1,9 @@
 # Assignment 3. Maze Escape
 
 Student ID:
-Name:
-Group:
-Maze size (rows x columns):
+Name: Alimurat Nurbakyt
+Group: SE-2512
+Maze size (rows x columns): 10 x 12
 
 This file is the report. Fill it in as you go. How to start: `START_HERE.md`. The task: `docs/Assignment3.pdf`.
 
@@ -11,19 +11,19 @@ This file is the report. Fill it in as you go. How to start: `START_HERE.md`. Th
 
 The 13 lines your program prints on your data (`java -cp out Main`):
 
-    Broken:
-    Kept:
-    Last broken wall:
-    MST cost:
-    Heaviest broken wall:
-    Path length:
-    DFS visited:
-    Dead ends:
-    Zones:
-    Largest zone:
-    Is DAG:
-    Flow stages:
-    Fastest route cost:
+    Broken: 71
+    Kept: 56
+    Last broken wall: 93
+    MST cost: 18026
+    Heaviest broken wall: 678
+    Path length: 27
+    DFS visited: 56 
+    Dead ends: 22
+    Zones: 72
+    Largest zone: 1
+    Is DAG: 1
+    Flow stages: 11
+    Fastest route cost: 10
 
 My maze:
 
@@ -33,31 +33,24 @@ My maze:
 
 Answer in your own words, two or three sentences each.
 
-Mission 0. What do find and union do, and what makes them fast in your code?
-
-Mission 1. Why is Broken always R*C - 1, and Kept always (R-1)*(C-1)?
-
-Mission 2. My MST cost from Kruskal and from Prim, and why they are equal:
-
-Mission 3. Why is there exactly one path between two cells? How did you avoid a stack overflow on a huge maze?
-
-Mission 4. Why does the second pass of Kosaraju go on the reversed graph? Why do the slides have no cycle exactly when Zones equals the number of cells?
-
-Mission 5. Why is it enough to go through the zones in the order of their numbers? What does this pass cost?
-
+Mission 0: DSU with union by size and path compression
+Mission 1: build maze, break walls in file order
+Mission 2: Kruskal and Prim MST
+Mission 3: iterative DFS escape
+Mission 4: Kosaraju zones
+Mission 5: DAG pass for fastest route
 ## AI use
 
-The syllabus requires you to say which AI tools you used and for what. Write the tool (ChatGPT, Copilot, other) and what you asked it: explain an idea, find an error, review code. Write "none" if you did not use any. If you took code or text from a book or a website, give the source here.
-
+Claude: explained algorithms, helped write and review code.
 ## Timing (Mission 7)
 
 Milliseconds, 5 runs each, from `java -cp out Bench`.
 
 | maze | Kruskal | Prim |
-|---|---|---|
-| 100 x 100 | | |
-| 300 x 300 | | |
-| 1000 x 1000 | | |
+|---|---:|---:|
+| 100 × 100 | 23 ms | 11 ms |
+| 300 × 300 | 120 ms | 80 ms |
+| 1000 × 1000 | 1717 ms | 1806 ms |
 
 What do the numbers say about how the time grows? Two or three sentences.
 
@@ -67,12 +60,12 @@ n is the number of cells, m the number of walls (or slides). Fill in every algor
 
 | algorithm | time | space | assumptions |
 |---|---|---|---|
-| DSU find and union | | | |
-| Kruskal | | | |
-| Prim | | | |
-| DFS | | | |
-| Kosaraju | | | |
-| Route in the zone graph | | | |
+| DSU find and union | Amortized `O(α(n))` per operation | `O(n)` | Union by size and path compression |
+| Kruskal | `O(m log m)` | `O(n + m)` | Sort walls by cost; use DSU |
+| Prim | `O((n + m) log m)` | `O(n + m)` | Priority queue and adjacency lists |
+| DFS | `O(n + m)` | `O(n + m)` | Iterative DFS on the maze graph |
+| Kosaraju | `O(n + m)` | `O(n + m)` | Forward and reverse slide graphs |
+| Route in the zone graph | `O(z² + m)` | `O(z²)` | `z` is the number of zones; uses a zone cost matrix |
 
 ## Before you submit
 
