@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Missions 4 and 5. The slides: a directed graph. Cells are 0 .. n-1, slide i goes from s.from()[i] to s.to()[i]
  * and takes s.time()[i]. There are no slides from a cell to itself, and the exit can always be reached from the start.
@@ -19,8 +21,73 @@ public class Zones {
      * Is DAG in Main is 1 when the number of zones equals the number of cells (no cycle), so you do not need a separate check.
      */
     public static int[] kosaraju(Input.Slides s) {
-        // TODO
-        return new int[s.n()];
+        int n = s.n();
+        int[][] forward = Graphs.slidesFrom(s);
+        int[][] reverse = Graphs.slidesInto(s);
+
+        // Первый проход: DFS по прямым рёбрам, записываем порядок завершения.
+        boolean[] seen = new boolean[n];
+        int[] finish = new int[n];
+        int finished = 0;
+        int[] stack = new int[n];
+        int[] next = new int[n];
+
+        for (int start = 0; start < n; start++) {
+            if (seen[start]) continue;
+
+            int top = 0;
+            stack[0] = start;
+            next[0] = 0;
+            seen[start] = true;
+
+            while (top >= 0) {
+                int u = stack[top];
+
+                if (next[top] < forward[u].length) {
+                    int edge = forward[u][next[top]++];
+                    int v = s.to()[edge];
+
+                    if (!seen[v]) {
+                        seen[v] = true;
+                        stack[++top] = v;
+                        next[top] = 0;
+                    }
+                } else {
+                    finish[finished++] = u;
+                    top--;
+                }
+            }
+        }
+
+        // Второй проход: в обратном порядке завершения по обратным рёбрам.
+        int[] zoneOf = new int[n];
+        Arrays.fill(zoneOf, -1);
+        int zone = 0;
+        int[] todo = new int[n];
+
+        for (int i = finished - 1; i >= 0; i--) {
+            int start = finish[i];
+            if (zoneOf[start] != -1) continue;
+
+            int top = 0;
+            todo[0] = start;
+            zoneOf[start] = zone;
+
+            while (top >= 0) {
+                int u = todo[top--];
+
+                for (int edge : reverse[u]) {
+                    int v = s.from()[edge];
+                    if (zoneOf[v] == -1) {
+                        zoneOf[v] = zone;
+                        todo[++top] = v;
+                    }
+                }
+            }
+            zone++;
+        }
+
+        return zoneOf;
     }
 
     /**
